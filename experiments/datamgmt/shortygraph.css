@@ -1,0 +1,73 @@
+
+body {
+  font: 14px "Helvetica Neue";
+}
+
+
+
+path.link {
+  fill: none;
+  stroke: #666;
+  stroke-width: 2px;
+}
+
+
+path.link-label-murders {
+  stroke: #990000;
+}
+
+path.link-type-c {
+  stroke: #99CC00;
+}
+
+path.link-type-d {
+  stroke: #FF00FF;
+  stroke-dasharray: 0,2 1;
+}
+
+/*TODO tidy marker css*/
+marker#arrow1 {
+  fill: #990000;
+}
+
+
+
+/* node shape */
+
+circle {
+  fill: #fff;
+  stroke: #333;
+  stroke-width: 1px;
+  stroke-opacity: 0.8;
+}
+
+circle.node-male {
+  fill: #66CCFF;
+}
+circle.node-female {
+  fill: #FF66CC;
+}
+
+circle.node-jail {
+  fill: #f00;
+}
+
+
+
+
+/* node and line label styling */
+
+text {
+  font: 14px sans-serif;
+  pointer-events: none;
+}
+
+text.shadow {
+  stroke: #fff;
+  stroke-width: 4px;
+}
+
+text.arc {
+  font: 10px sans-serif;
+}
+

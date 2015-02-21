@@ -1,0 +1,67 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import optparse
+
+import csv
+import json
+
+
+import datetime
+
+
+def date_to_episode_code(date):
+
+	# print "date_to_episode_code", date
+
+	d = None
+
+	for fmt in ("%d %B %Y", "%B %Y", "%Y"):
+		# print "trying", fmt
+		try:
+			d = datetime.datetime.strptime(date, fmt)
+			break
+		except Exception, e:
+			pass
+
+	# print d
+
+	if not d:
+		print "FAILED TO GET DATE FROM:", date
+		return 0
+
+	return int(d.strftime("%Y%m"))
+
+
+
+csv.register_dialect('tsv', delimiter='\t')
+
+f = open("deaths.tsv", 'rt')
+try:
+    reader = csv.reader(f, dialect='tsv')
+    for row in reader:
+        # print row
+        # print date_to_episode_code(row[1])
+        print json.dumps({
+        	"source":row[0], "target":"Dead", "starting":date_to_episode_code(row[1]),
+        	"ending":999999,
+        	"label":row[2], "type":"B",
+        	}),","
+finally:
+    f.close()
+
+
+# f = open("weddings.csv", 'rt')
+# try:
+#     reader = csv.reader(f)
+#     for row in reader:
+#         # print row
+#         print json.dumps({
+#         	"source":row[1], "target":row[2], "starting":int(row[0]),
+#         	"ending":999999,
+#         	"label":"married", "type":"C",
+#         	}),","
+# finally:
+#     f.close()
+

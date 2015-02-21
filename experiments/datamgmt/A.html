@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+        <title>ShortyGraph: Experiments</title>
+        <link type="text/css" rel="stylesheet" href="shortygraph.css"/>
+        <script src="d3.v3.min.js"></script>
+        <script type="text/javascript" src="test-data.js"></script>
+    </head>
+    <body>
+        <h1>ShortyGraph: data mgmt testing</h1>
+        <form>
+        Episode: <span id="episode"></span>
+        <input type="range" id="episodeSlider" name="episode"
+            value="200001" min="199001" max="201601" onchange="set_episode(this.value)">
+        <br>
+        <span id="episode_year_value"></span>
+        <input type="range" name="episode_year"
+            value="2000" min="1992" max="2016" onchange="set_episode_year(this.value)">
+        <span id="episode_month_value"></span>
+        <input type="range" name="episode_month"
+            value="01" min="01" max="12" onchange="set_episode_month(this.value)">
+        <br>
+        episode: <input onchange="set_episode(this.value)">
+        <br>
+        charge: <input onchange="set_charge(this.value)" value="-200">
+        <br>
+        link_distance: <input onchange="set_link_distance(this.value)" value="60">
+        <br>
+        </form>
+        <div id="chart"></div>
+
+        <script type="text/javascript" src="shortygraph.js"></script>
+
+    </body>
+</html>
