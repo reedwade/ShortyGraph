@@ -10,11 +10,32 @@ import json
 
 import datetime
 
+csv.register_dialect('tsv', delimiter='\t')
+
+
+data_inputs = (
+    dict(file_name='data/deaths.tsv',
+        date=1, source=0, target="Dead", starting=1, ending="999999", type="B", label=2, details=3,
+        ),
+    dict(file_name='data/fake-deaths.tsv',
+        date=1, source=0, target="Fake Dead", starting=1, ending="999999", type="B", label=2, details=3,
+        ),
+    dict(file_name='data/weddings.tsv',
+        date=0, source=1, target=2, starting=0, ending="999999", type="C", label="married", details=3,
+        ),
+    dict(file_name='data/aborted-weddings.tsv',
+        date=0, source=1, target=2, starting=0, ending="999999", type="C", label="nearly got married", details=3,
+        ),
+    dict(file_name='data/births.tsv',
+        date=1, source=2, target=3, starting=1, ending=1, type="C", label=0, details=4,
+        ),
+    )
 
 def date_to_episode_code(date):
 
-    # print "date_to_episode_code", date
-
+    #
+    # some date fields have stray refs in them
+    #
     for t in ('(1)', '(approx)'):
         date = date.replace(t, '')
 
@@ -40,61 +61,80 @@ def date_to_episode_code(date):
     return int(d.strftime("%Y%m"))
 
 
-
-csv.register_dialect('tsv', delimiter='\t')
-
-
-if False:
-    f = open("deaths.tsv", 'rt')
+for i in data_inputs:
+    f = open(i['file_name'], 'rt')
     try:
         reader = csv.reader(f, dialect='tsv')
+
         for row in reader:
-            d = date_to_episode_code(row[1])
-            print json.dumps({
-                "source":row[0], "target":"Dead", "starting":d,
-                "ending":999999,
-                "label":row[2], "type":"B",
-                }),","
+
+            if i.has_key('date'):
+                row[i['date']] = date_to_episode_code(row[i['date']])
+
+            r = {}
+            for k in ('source', 'target', 'starting', 'ending', 'label', 'details', 'type'):
+                r[k] = i[k] if isinstance(i[k], basestring) else row[i[k]]
+
+            print json.dumps(r), ","
+
     except Exception, e:
         print "failed on row:", row
         raise
     finally:
-        f.close()
-
-if False:
-    f = open("weddings.tsv", 'rt')
-    try:
-        reader = csv.reader(f, dialect='tsv')
-        for row in reader:
-            d = date_to_episode_code(row[0])
-            print json.dumps({
-                "source":row[1], "target":row[2], "starting":d,
-                "ending":999999,
-                "label":row[3], "type":"C",
-                }),","
-    except Exception, e:
-        print "failed on row:", row
-        raise
-    finally:
-        f.close()
+        f.close()   
 
 
-if True:
-    f = open("aborted-weddings.tsv", 'rt')
-    try:
-        reader = csv.reader(f, dialect='tsv')
-        for row in reader:
-            d = date_to_episode_code(row[0])
-            print json.dumps({
-                "source":row[1], "target":row[2], "starting":d,
-                "ending":999999,
-                "label":row[3], "type":"C",
-                }),","
-    except Exception, e:
-        print "failed on row:", row
-        raise
-    finally:
-        f.close()
+# if False:
+#     f = open("deaths.tsv", 'rt')
+#     try:
+#         reader = csv.reader(f, dialect='tsv')
+#         for row in reader:
+#             d = date_to_episode_code(row[1])
+#             print json.dumps({
+#                 "source":row[0], "target":"Dead", "starting":d,
+#                 "ending":999999,
+#                 "label":row[2], "type":"B",
+#                 }),","
+#     except Exception, e:
+#         print "failed on row:", row
+#         raise
+#     finally:
+#         f.close()
+
+# if False:
+#     f = open("weddings.tsv", 'rt')
+#     try:
+#         reader = csv.reader(f, dialect='tsv')
+#         for row in reader:
+#             d = date_to_episode_code(row[0])
+#             print json.dumps({
+#                 "source":row[1], "target":row[2], "starting":d,
+#                 "ending":999999,
+#                 "label":row[3], "type":"C",
+#                 }),","
+#     except Exception, e:
+#         print "failed on row:", row
+#         raise
+#     finally:
+#         f.close()
+
+
+# if False:
+#     f = open("aborted-weddings.tsv", 'rt')
+#     try:
+#         reader = csv.reader(f, dialect='tsv')
+#         for row in reader:
+#             d = date_to_episode_code(row[0])
+#             print json.dumps({
+#                 "source":row[1], "target":row[2], "starting":d,
+#                 "ending":999999,
+#                 "label":row[3], "type":"C",
+#                 }),","
+#     except Exception, e:
+#         print "failed on row:", row
+#         raise
+#     finally:
+#         f.close()
 
 
 
