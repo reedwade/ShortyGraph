@@ -13,55 +13,89 @@ import datetime
 
 def date_to_episode_code(date):
 
-	# print "date_to_episode_code", date
+    # print "date_to_episode_code", date
 
-	d = None
+    for t in ('(1)', '(approx)'):
+        date = date.replace(t, '')
 
-	for fmt in ("%d %B %Y", "%B %Y", "%Y"):
-		# print "trying", fmt
-		try:
-			d = datetime.datetime.strptime(date, fmt)
-			break
-		except Exception, e:
-			pass
+    date = date.strip()
 
-	# print d
+    d = None
 
-	if not d:
-		print "FAILED TO GET DATE FROM:", date
-		return 0
+    for fmt in ("%d %B %Y", "%B %Y", "%Y"):
+        # print "trying", fmt
+        try:
+            d = datetime.datetime.strptime(date, fmt)
+            break
+        except Exception, e:
+            pass
 
-	return int(d.strftime("%Y%m"))
+    # print d
+
+    if not d:
+        print "FAILED TO GET DATE FROM:", date
+        raise Exception("can't parse date string: "+date)
+        return 0
+
+    return int(d.strftime("%Y%m"))
 
 
 
 csv.register_dialect('tsv', delimiter='\t')
 
-f = open("deaths.tsv", 'rt')
-try:
-    reader = csv.reader(f, dialect='tsv')
-    for row in reader:
-        # print row
-        # print date_to_episode_code(row[1])
-        print json.dumps({
-        	"source":row[0], "target":"Dead", "starting":date_to_episode_code(row[1]),
-        	"ending":999999,
-        	"label":row[2], "type":"B",
-        	}),","
-finally:
-    f.close()
+
+if False:
+    f = open("deaths.tsv", 'rt')
+    try:
+        reader = csv.reader(f, dialect='tsv')
+        for row in reader:
+            d = date_to_episode_code(row[1])
+            print json.dumps({
+                "source":row[0], "target":"Dead", "starting":d,
+                "ending":999999,
+                "label":row[2], "type":"B",
+                }),","
+    except Exception, e:
+        print "failed on row:", row
+        raise
+    finally:
+        f.close()
+
+if False:
+    f = open("weddings.tsv", 'rt')
+    try:
+        reader = csv.reader(f, dialect='tsv')
+        for row in reader:
+            d = date_to_episode_code(row[0])
+            print json.dumps({
+                "source":row[1], "target":row[2], "starting":d,
+                "ending":999999,
+                "label":row[3], "type":"C",
+                }),","
+    except Exception, e:
+        print "failed on row:", row
+        raise
+    finally:
+        f.close()
 
 
-# f = open("weddings.csv", 'rt')
-# try:
-#     reader = csv.reader(f)
-#     for row in reader:
-#         # print row
-#         print json.dumps({
-#         	"source":row[1], "target":row[2], "starting":int(row[0]),
-#         	"ending":999999,
-#         	"label":"married", "type":"C",
-#         	}),","
-# finally:
-#     f.close()
+if True:
+    f = open("aborted-weddings.tsv", 'rt')
+    try:
+        reader = csv.reader(f, dialect='tsv')
+        for row in reader:
+            d = date_to_episode_code(row[0])
+            print json.dumps({
+                "source":row[1], "target":row[2], "starting":d,
+                "ending":999999,
+                "label":row[3], "type":"C",
+                }),","
+    except Exception, e:
+        print "failed on row:", row
+        raise
+    finally:
+        f.close()
+
+
+
 
