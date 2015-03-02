@@ -1,0 +1,129 @@
+#!/usr/bin/env python
+
+import os
+import sys
+# import optparse
+
+# import csv
+import json
+
+
+import datetime
+
+import pprint
+pp = pprint.PrettyPrinter(indent=4)
+
+# csv.register_dialect('tsv', delimiter='\t')
+
+
+# data_inputs = (
+#     dict(file_name='data/cast',
+#         date=1, source=0, target="Dead", starting=1, ending="999999", type="B", label=2, details=3,
+#         ),
+#     # dict(file_name='data/deaths.tsv',
+#     #     date=1, source=0, target="Dead", starting=1, ending="999999", type="B", label=2, details=3,
+#     #     ),
+#     # dict(file_name='data/fake-deaths.tsv',
+#     #     date=1, source=0, target="Fake Dead", starting=1, ending="999999", type="B", label=2, details=3,
+#     #     ),
+#     # dict(file_name='data/weddings.tsv',
+#     #     date=0, source=1, target=2, starting=0, ending="999999", type="C", label="married", details=3,
+#     #     ),
+#     # dict(file_name='data/aborted-weddings.tsv',
+#     #     date=0, source=1, target=2, starting=0, ending="999999", type="C", label="nearly got married", details=3,
+#     #     ),
+#     # dict(file_name='data/births.tsv',
+#     #     date=1, source=2, target=3, starting=1, ending=1, type="C", label=0, details=4,
+#     #     ),
+#     )
+
+def date_to_episode_code(date):
+
+    #
+    # some date fields have stray refs in them
+    #
+    for t in ('(1)', '(approx)'):
+        date = date.replace(t, '')
+
+    date = date.strip()
+
+    d = None
+
+    for fmt in ("%d %B %Y", "%B %Y", "%Y"):
+        # print "trying", fmt
+        try:
+            d = datetime.datetime.strptime(date, fmt)
+            break
+        except Exception, e:
+            pass
+
+    # print d
+
+    if not d:
+        print "FAILED TO GET DATE FROM:", date
+        raise Exception("can't parse date string: "+date)
+        return 0
+
+    return int(d.strftime("%Y%m"))
+
+
+skip_if_starts_with = (
+    '#',
+    'Actor',
+    )
+
+
+year = ''
+subsection = ''
+by_year = {
+    year: { subsection: [] }
+}
+
+f = open('data/cast', 'rt')
+try:
+
+    for line in f.readlines():
+        line = line.strip()
+
+
+        for skippy in skip_if_starts_with:
+            if line.startswith(skippy):
+                line = ''
+                continue
+
+        if line.startswith('YEAR '):
+            year = line[len('YEAR '):]
+            subsection = ''
+            by_year[year] = { subsection: [] }
+            continue
+
+        if line.endswith('[edit]'):
+            subsection = line[:-len('[edit]')]
+            by_year[year][subsection] = []
+            continue
+
+        if line:
+
+            if '\t' in line:
+                c = line.split('\t')[1]
+            elif '(' in line and ')' in line:
+                c = line.split('(')[1].split(')')[0]
+
+                if c in ('himself', 'herself'):
+                    c = line.split('(')[0].strip()
+            elif ' - ' in line:
+                c = line.split(' - ')[0]
+            else:
+                c = line
+
+            # line = "c=<"+c+">"+line
+
+            by_year[year][subsection].append(c)
+
+    pp.pprint(by_year)
+
+
+except Exception, e:
+    raise
+finally:
+    f.close()   
